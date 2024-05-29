@@ -1,0 +1,5 @@
+# Folder
+.vscode/
+venv/
+out/
+conan/

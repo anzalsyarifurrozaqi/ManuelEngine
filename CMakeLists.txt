@@ -1,58 +1,9 @@
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.25)
 project(Manuel-Engine CXX)
 
-# Global Options
+# Global Option
 include(CMakeDependentOption)
-option(BUILD_TESTS "Build test programs" OFF)
-
-# c++20 standard, no extesions
-set(CMAKE_C_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-if(BUILD_TESTS)
-    enable_testing()
-endif()
-
-# Header Exports
-include(GenerateExportHeader)
-set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-set(CMAKE_VISIBILITY_INLINES_HIDDER 1)
-
-# Libraries
-add_subdirectory(lib)
-
-# Engine Entrypoint
-add_executable(Manuel_Bringup)
-
-# Engine Library
-set(CMAKE_CXX_VISIBILITY_PRESET default)
-set(CMAKE_VISIBILITY_INLINES_HIDDEN OFF)
-
-# Source
-add_subdirectory(src)
-
-if(BUILD_DOC)
-    find_package(Doxygen)
-    if (DOXYGEN_FOUND)
-                SET(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxygen.in)
-                SET(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxygen)
-
-                configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
-
-                add_custom_target(doc ALL
-                        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
-                        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                        COMMENT "Buidling Doxygen documentation"
-                        VERBATIM )
-    else (DOXYGEN_FOUND)
-                message("No doxygen binary found on the system.")
-                SET(${BUILD_DOC} OFF)
-    endif ()
-endif()
-
+option(BUILD_TEST "Build test programs" OFF)
 option(ONLY_COVERAGE "Build only tests necessary for coverage" FALSE)
 option(LIBCPP "Build with libc++" FALSE)
 option(ENABLE_COVERAGE "Enable coverage reporting for gcc/clang" FALSE)
@@ -66,7 +17,43 @@ option(BUILD_DOC "Build the project's documentation" ON)
 option(FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." TRUE)
 option(DEBUG_LOGGING "Enabling debug logging" FALSE)
 
+# C11 standard, no extensions
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
 
+# C++20 standard, no extensions
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Header Exports
+include(GenerateExportHeader)
+set(CMAKE_C_VISIBILITY_PRESET hidden)
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+
+if(BUILD_TESTS)
+  enable_testing()
+endif()
+
+# Libraries
+add_subdirectory(lib)
+
+# Test
+find_package(fmt REQUIRED)
+
+# Engine Entrypoint
+add_executable(Manuel_Bringup)
+
+# Source
+add_subdirectory(src)
+
+# Test
+target_link_libraries(Manuel_Bringup PRIVATE fmt::fmt)
+
+
+# Summery
 message("#########################################")
 message("\t \t Summary")
 message("#########################################")
@@ -81,6 +68,7 @@ message("Shared libs:      \t ${BUILD_SHARED_LIBS}")
 message("Build libcpp:     \t ${LIBCPP}")
 message("CCache executable:\t ${CCACHE}")
 message("Building doc:     \t ${BUILD_DOC}")
+message("BUILD_TEST:       \t ${BUILD_TEST}")
 message("------------------------------------------")
 message("Version:          \t ${PROJECT_VERSION}")
 message("########################################")

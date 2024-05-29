@@ -1,1 +1,3 @@
 #include "Log.hpp"
+
+MANUEL_DEFINE_LOG_CATEGORY(ManuelCore, MANUEL_LOG_LEVEL_ALL)

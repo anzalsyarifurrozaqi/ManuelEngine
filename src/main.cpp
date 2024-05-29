@@ -1,8 +1,8 @@
 #include <iostream>
+#include <fmt/core.h>
 
 int main(int argc, char **argv) 
 {
-    std::cout << "Hello Manuel Engine test" << std::endl;
-
+    fmt::print("Hello, {}!\n", "world");
     return 0;
 }
